@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TimeSlot extends Model
+{
+    protected $fillable = ['doctor_id', 'date', 'start_time', 'end_time', 'is_booked'];
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function appointment()
+    {
+        return $this->hasOne(Appointment::class);
+    }
+}
