@@ -3,34 +3,35 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Resources\UserResource;
+use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // REGISTER
-    public function register(Request $request)
+    // REGISTER — hanya untuk pasien (pasien daftar sendiri)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt($request->password),
+            'role'     => 'patient',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'user'
-        ]);
+        // Otomatis buat profile pasien kosong
+        Patient::create(['user_id' => $user->id]);
 
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
-            'token' => $token
+            'user'   => new UserResource($user),
+            'token'  => $token,
         ], 201);
     }
 
@@ -38,29 +39,36 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
+            'email'    => 'required|email',
+            'password' => 'required',
         ]);
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid credentials'
+                'status'  => 'error',
+                'message' => 'Invalid credentials',
             ], 401);
         }
 
-        // ❗ revoke old tokens (BEST PRACTICE)
+        if (!$user->is_active) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Account is deactivated. Please contact admin.',
+            ], 403);
+        }
+
+        // Revoke semua token lama
         $user->tokens()->delete();
 
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
-            'role' => $user->role, // penting untuk Android/React routing
-            'token' => $token
+            'user'   => new UserResource($user),
+            'role'   => $user->role,
+            'token'  => $token,
         ]);
     }
 
@@ -72,8 +80,45 @@ class AuthController extends Controller
         }
 
         return response()->json([
+            'status'  => 'success',
+            'message' => 'Logged out successfully',
+        ]);
+    }
+
+    // GET /me — profil user yang sedang login
+    public function me(Request $request)
+    {
+        $user = $request->user()->load($request->user()->role === 'doctor' ? 'doctor' : 'patient');
+
+        return response()->json([
             'status' => 'success',
-            'message' => 'Logged out'
+            'data'   => new UserResource($user),
+        ]);
+    }
+
+    // PUT /change-password
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = $request->user();
+
+        // Verifikasi password lama
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Password saat ini tidak sesuai.',
+            ], 422);
+        }
+
+        // Update password baru & revoke token
+        $user->update([
+            'password' => bcrypt($request->password)
+        ]);
+
+        $user->tokens()->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Password berhasil diubah. Silakan login kembali.',
         ]);
     }
 }
