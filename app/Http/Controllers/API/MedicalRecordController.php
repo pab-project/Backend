@@ -70,7 +70,7 @@ class MedicalRecordController extends Controller
         $records = MedicalRecord::with(['doctor.user', 'appointment.timeSlot'])
             ->where('patient_id', $patient->id)
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->get();
 
         return MedicalRecordResource::collection($records);
     }

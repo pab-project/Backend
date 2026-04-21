@@ -22,7 +22,7 @@ class PatientController extends Controller
             });
         }
 
-        $patients = $query->paginate(10);
+        $patients = $query->get();
 
         return PatientResource::collection($patients);
     }

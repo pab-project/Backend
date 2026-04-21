@@ -30,7 +30,7 @@ class DoctorController extends Controller
             });
         }
 
-        $doctors = $query->paginate(10);
+        $doctors = $query->get();
 
         return DoctorResource::collection($doctors);
     }

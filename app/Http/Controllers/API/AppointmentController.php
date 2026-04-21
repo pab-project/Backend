@@ -18,7 +18,7 @@ class AppointmentController extends Controller
         $appointments = Appointment::with(['patient.user', 'doctor.user', 'timeSlot'])
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->get();
 
         return AppointmentResource::collection($appointments);
     }
@@ -85,7 +85,7 @@ class AppointmentController extends Controller
             ->where('patient_id', $patient->id)
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->get();
 
         return AppointmentResource::collection($appointments);
     }
@@ -161,7 +161,7 @@ class AppointmentController extends Controller
             ->where('doctor_id', $doctor->id)
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->get();
 
         return AppointmentResource::collection($appointments);
     }

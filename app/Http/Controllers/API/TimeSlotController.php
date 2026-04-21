@@ -24,7 +24,7 @@ class TimeSlotController extends Controller
             ->when($request->filled('is_booked'), fn($q) => $q->where('is_booked', filter_var($request->is_booked, FILTER_VALIDATE_BOOLEAN)))
             ->orderBy('date')
             ->orderBy('start_time')
-            ->paginate(20);
+            ->get();
 
         return TimeSlotResource::collection($slots);
     }
