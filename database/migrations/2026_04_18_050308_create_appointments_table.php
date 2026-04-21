@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('doctor_id')->constrained()->cascadeOnDelete();
             $table->foreignId('time_slot_id')->constrained()->cascadeOnDelete();
 
-            $table->string('status')->default('pending');
+            $table->string('status')->default(\App\Enums\AppointmentStatusEnum::PENDING->value);
             $table->text('notes')->nullable();
 
             $table->timestamps();

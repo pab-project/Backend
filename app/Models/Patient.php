@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
+    use HasFactory;
     protected $fillable = ['user_id','date_of_birth','gender','address', 'phone'];
+
+    protected $casts = [
+        'gender' => \App\Enums\GenderEnum::class,
+    ];
 
     public function user()
     {
