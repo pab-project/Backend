@@ -18,7 +18,7 @@ class PatientController extends Controller
         if ($request->filled('search')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -34,7 +34,7 @@ class PatientController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => new PatientResource($patient),
+            'data' => new PatientResource($patient),
         ]);
     }
 
@@ -49,9 +49,9 @@ class PatientController extends Controller
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Data pasien berhasil diperbarui.',
-            'data'    => new PatientResource($patient->fresh('user')),
+            'data' => new PatientResource($patient->fresh('user')),
         ]);
     }
 
@@ -62,7 +62,7 @@ class PatientController extends Controller
         $patient->user->update(['is_active' => false]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Pasien berhasil dinonaktifkan.',
         ]);
     }
@@ -78,7 +78,7 @@ class PatientController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => new PatientResource($patient),
+            'data' => new PatientResource($patient),
         ]);
     }
 
@@ -98,9 +98,9 @@ class PatientController extends Controller
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Profil berhasil diperbarui.',
-            'data'    => new PatientResource($patient->load('user')),
+            'data' => new PatientResource($patient->load('user')),
         ]);
     }
 }

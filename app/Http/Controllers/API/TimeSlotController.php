@@ -46,23 +46,23 @@ class TimeSlotController extends Controller
 
         if ($exists) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Jadwal pada waktu tersebut sudah ada.',
             ], 422);
         }
 
         $slot = TimeSlot::create([
-            'doctor_id'  => $doctor->id,
-            'date'       => $request->date,
+            'doctor_id' => $doctor->id,
+            'date' => $request->date,
             'start_time' => $request->start_time,
-            'end_time'   => $request->end_time,
-            'is_booked'  => false,
+            'end_time' => $request->end_time,
+            'is_booked' => false,
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Jadwal berhasil ditambahkan.',
-            'data'    => new TimeSlotResource($slot),
+            'data' => new TimeSlotResource($slot),
         ], 201);
     }
 
@@ -70,11 +70,11 @@ class TimeSlotController extends Controller
     public function update(StoreTimeSlotRequest $request, $id)
     {
         $doctor = $request->user()->doctor;
-        $slot   = TimeSlot::where('doctor_id', $doctor->id)->findOrFail($id);
+        $slot = TimeSlot::where('doctor_id', $doctor->id)->findOrFail($id);
 
         if ($slot->is_booked) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Jadwal yang sudah dipesan tidak dapat diubah.',
             ], 422);
         }
@@ -82,9 +82,9 @@ class TimeSlotController extends Controller
         $slot->update($request->only(['date', 'start_time', 'end_time']));
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Jadwal berhasil diperbarui.',
-            'data'    => new TimeSlotResource($slot),
+            'data' => new TimeSlotResource($slot),
         ]);
     }
 
@@ -92,11 +92,11 @@ class TimeSlotController extends Controller
     public function destroy(Request $request, $id)
     {
         $doctor = $request->user()->doctor;
-        $slot   = TimeSlot::where('doctor_id', $doctor->id)->findOrFail($id);
+        $slot = TimeSlot::where('doctor_id', $doctor->id)->findOrFail($id);
 
         if ($slot->is_booked) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Jadwal yang sudah dipesan tidak dapat dihapus.',
             ], 422);
         }
@@ -104,7 +104,7 @@ class TimeSlotController extends Controller
         $slot->delete();
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Jadwal berhasil dihapus.',
         ]);
     }

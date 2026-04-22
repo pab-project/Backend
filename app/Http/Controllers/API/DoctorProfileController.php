@@ -16,14 +16,14 @@ class DoctorProfileController extends Controller
 
         if (!$doctor) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Profil dokter tidak ditemukan.',
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => new DoctorResource($doctor),
+            'data' => new DoctorResource($doctor),
         ]);
     }
 
@@ -34,7 +34,7 @@ class DoctorProfileController extends Controller
 
         if (!$doctor) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Profil dokter tidak ditemukan.',
             ], 404);
         }
@@ -47,9 +47,9 @@ class DoctorProfileController extends Controller
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Profil berhasil diperbarui.',
-            'data'    => new DoctorResource($doctor->load('user')),
+            'data' => new DoctorResource($doctor->load('user')),
         ]);
     }
 }

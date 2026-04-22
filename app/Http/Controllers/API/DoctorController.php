@@ -42,7 +42,7 @@ class DoctorController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => new DoctorResource($doctor),
+            'data' => new DoctorResource($doctor),
         ]);
     }
 
@@ -60,7 +60,7 @@ class DoctorController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => TimeSlotResource::collection($slots),
+            'data' => TimeSlotResource::collection($slots),
         ]);
     }
 
@@ -68,35 +68,35 @@ class DoctorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users,email',
-            'password'       => 'required|string|min:8',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
             'specialization' => 'required|string|max:255',
-            'phone'          => 'nullable|string|max:20',
-            'bio'            => 'nullable|string|max:1000',
+            'phone' => 'nullable|string|max:20',
+            'bio' => 'nullable|string|max:1000',
         ]);
 
         $doctor = DB::transaction(function () use ($request) {
             $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'password'  => Hash::make($request->password),
-                'role'      => 'doctor',
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'doctor',
                 'is_active' => true,
             ]);
 
             return Doctor::create([
-                'user_id'        => $user->id,
+                'user_id' => $user->id,
                 'specialization' => $request->specialization,
-                'phone'          => $request->phone,
-                'bio'            => $request->bio,
+                'phone' => $request->phone,
+                'bio' => $request->bio,
             ]);
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dokter berhasil ditambahkan.',
-            'data'    => new DoctorResource($doctor->load('user')),
+            'data' => new DoctorResource($doctor->load('user')),
         ], 201);
     }
 
@@ -118,9 +118,9 @@ class DoctorController extends Controller
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Data dokter berhasil diperbarui.',
-            'data'    => new DoctorResource($doctor->fresh('user')),
+            'data' => new DoctorResource($doctor->fresh('user')),
         ]);
     }
 
@@ -131,7 +131,7 @@ class DoctorController extends Controller
         $doctor->user->update(['is_active' => false]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dokter berhasil dinonaktifkan.',
         ]);
     }

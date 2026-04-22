@@ -14,13 +14,13 @@ class MedicalRecordController extends Controller
     // POST /doctor/medical-records — dokter input rekam medis
     public function store(StoreMedicalRecordRequest $request)
     {
-        $doctor      = $request->user()->doctor;
+        $doctor = $request->user()->doctor;
         $appointment = Appointment::findOrFail($request->appointment_id);
 
         // Pastikan appointment ini milik dokter yang sedang login
         if ($appointment->doctor_id !== $doctor->id) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Anda tidak memiliki akses ke appointment ini.',
             ], 403);
         }
@@ -28,7 +28,7 @@ class MedicalRecordController extends Controller
         // Pastikan appointment sudah selesai
         if ($appointment->status !== 'done') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Rekam medis hanya bisa dibuat untuk appointment yang sudah selesai.',
             ], 422);
         }
@@ -36,25 +36,25 @@ class MedicalRecordController extends Controller
         // Cek apakah sudah ada medical record untuk appointment ini
         if (MedicalRecord::where('appointment_id', $appointment->id)->exists()) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Rekam medis untuk appointment ini sudah ada.',
             ], 422);
         }
 
         $record = MedicalRecord::create([
             'appointment_id' => $appointment->id,
-            'patient_id'     => $appointment->patient_id,
-            'doctor_id'      => $doctor->id,
-            'diagnosis'      => $request->diagnosis,
-            'treatment'      => $request->treatment,
-            'medications'    => $request->medications,
-            'notes'          => $request->notes,
+            'patient_id' => $appointment->patient_id,
+            'doctor_id' => $doctor->id,
+            'diagnosis' => $request->diagnosis,
+            'treatment' => $request->treatment,
+            'medications' => $request->medications,
+            'notes' => $request->notes,
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Rekam medis berhasil disimpan.',
-            'data'    => new MedicalRecordResource($record->load(['patient.user', 'doctor.user'])),
+            'data' => new MedicalRecordResource($record->load(['patient.user', 'doctor.user'])),
         ], 201);
     }
 
@@ -86,7 +86,7 @@ class MedicalRecordController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => new MedicalRecordResource($record),
+            'data' => new MedicalRecordResource($record),
         ]);
     }
 
@@ -125,7 +125,7 @@ class MedicalRecordController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => new MedicalRecordResource($record),
+            'data' => new MedicalRecordResource($record),
         ]);
     }
 }

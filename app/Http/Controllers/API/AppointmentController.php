@@ -30,7 +30,7 @@ class AppointmentController extends Controller
 
         if ($appointment->status !== 'pending') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Hanya appointment dengan status pending yang bisa di-approve.',
             ], 422);
         }
@@ -38,9 +38,9 @@ class AppointmentController extends Controller
         $appointment->update(['status' => 'approved']);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Appointment berhasil di-approve.',
-            'data'    => new AppointmentResource($appointment),
+            'data' => new AppointmentResource($appointment),
         ]);
     }
 
@@ -51,7 +51,7 @@ class AppointmentController extends Controller
 
         if ($appointment->status !== 'pending') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Hanya appointment dengan status pending yang bisa ditolak.',
             ], 422);
         }
@@ -60,15 +60,15 @@ class AppointmentController extends Controller
         DB::transaction(function () use ($appointment, $request) {
             $appointment->update([
                 'status' => 'rejected',
-                'notes'  => $request->filled('reason') ? $appointment->notes . ' [Alasan Penolakan: ' . $request->reason . ']' : $appointment->notes,
+                'notes' => $request->filled('reason') ? $appointment->notes . ' [Alasan Penolakan: ' . $request->reason . ']' : $appointment->notes,
             ]);
             $appointment->timeSlot->update(['is_booked' => false]);
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Appointment berhasil ditolak.',
-            'data'    => new AppointmentResource($appointment->fresh(['patient.user', 'doctor.user', 'timeSlot'])),
+            'data' => new AppointmentResource($appointment->fresh(['patient.user', 'doctor.user', 'timeSlot'])),
         ]);
     }
 
@@ -109,30 +109,30 @@ class AppointmentController extends Controller
             $slot->update(['is_booked' => true]);
 
             return Appointment::create([
-                'patient_id'   => $patient->id,
-                'doctor_id'    => $slot->doctor_id,
+                'patient_id' => $patient->id,
+                'doctor_id' => $slot->doctor_id,
                 'time_slot_id' => $slot->id,
-                'status'       => 'pending',
-                'notes'        => $request->notes,
+                'status' => 'pending',
+                'notes' => $request->notes,
             ]);
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Appointment berhasil dibuat, menunggu konfirmasi admin.',
-            'data'    => new AppointmentResource($appointment->load(['patient.user', 'doctor.user', 'timeSlot'])),
+            'data' => new AppointmentResource($appointment->load(['patient.user', 'doctor.user', 'timeSlot'])),
         ], 201);
     }
 
     // PATCH /patient/appointments/{id}/cancel — pasien batalkan appointment
     public function cancel(Request $request, $id)
     {
-        $patient     = $request->user()->patient;
+        $patient = $request->user()->patient;
         $appointment = Appointment::where('patient_id', $patient->id)->findOrFail($id);
 
         if (!in_array($appointment->status, ['pending', 'approved'])) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Appointment tidak dapat dibatalkan.',
             ], 422);
         }
@@ -143,7 +143,7 @@ class AppointmentController extends Controller
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Appointment berhasil dibatalkan.',
         ]);
     }
@@ -169,12 +169,12 @@ class AppointmentController extends Controller
     // PATCH /doctor/appointments/{id}/done — dokter tandai appointment selesai
     public function markDone(Request $request, $id)
     {
-        $doctor      = $request->user()->doctor;
+        $doctor = $request->user()->doctor;
         $appointment = Appointment::where('doctor_id', $doctor->id)->findOrFail($id);
 
         if ($appointment->status !== 'approved') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Hanya appointment yang sudah di-approve yang bisa ditandai selesai.',
             ], 422);
         }
@@ -182,9 +182,9 @@ class AppointmentController extends Controller
         $appointment->update(['status' => 'done']);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Appointment ditandai selesai.',
-            'data'    => new AppointmentResource($appointment->load(['patient.user', 'timeSlot'])),
+            'data' => new AppointmentResource($appointment->load(['patient.user', 'timeSlot'])),
         ]);
     }
 }
